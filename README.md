@@ -1,1 +1,1 @@
-https://bagged-crown-86036.herokuapp.com/api/persons
+https://bagged-crown-86036.herokuapp.com
