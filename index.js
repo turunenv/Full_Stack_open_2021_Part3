@@ -92,31 +92,20 @@ app.delete("/api/persons/:id", function(req, res) {
 app.post("/api/persons", function(req, res) {
     const body = req.body;
 
-    //name or number missing? Name already added? Return status code 400 bad request
-    let errorMsg;
-    if (!body.name) {
-        errorMsg = "Name of the person is missing."
-    } else if (!body.number) {
-        errorMsg = "Number of the person is missing."
-    } else if (doesNameAlreadyExist(body.name)) {
-        errorMsg = "Name must be unique."
-    }
-
-    if (errorMsg) {
-        return res.status(400).json({
-            error: errorMsg
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'name or number missing'
         })
-    } else {
-
-        const newPerson = {
-            id: generateId(),
-            name: body.name,
-            number: body.number
-        }
-
-        persons = persons.concat(newPerson);
-        res.json(newPerson);
     }
+
+    const person = new Person({
+        name: body.name,
+        number: body.number,
+    })
+
+    person.save().then(savedPerson => {
+        res.json(savedPerson);
+    })
 })
 
 const PORT = process.env.PORT || 3001;
