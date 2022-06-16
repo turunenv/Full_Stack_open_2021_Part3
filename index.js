@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const app = express();
 
@@ -8,6 +10,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("build"));
 app.use(morgan("tiny"));
+
+const Person = require('./models/person.js')
 
 
 
@@ -57,8 +61,9 @@ app.get("/", function(req, res) {
 })
 
 app.get("/api/persons", function(req, res) {
-    
-    res.json(persons);
+    Person.find({}).then(persons => {
+        res.json(persons);
+    })
 })
 
 app.get("/info", function(req, res) {
