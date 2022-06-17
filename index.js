@@ -23,7 +23,7 @@ function doesNameAlreadyExist(name) {
     return false;
 }
 
-app.get("/", function(req, res) {
+app.get("/", (req, res) => {
     res.send("<h1>Full Stack open part 3, yey!</h1>");
 })
 
@@ -33,14 +33,14 @@ app.get("/api/persons", function(req, res) {
     })
 })
 
-app.get("/info", function(req, res) {
+app.get("/info", (req, res) => {
     let time = Date();
     let numPersons = persons.length;
 
     res.send(`<p>Phonebook has info for ${numPersons} people<br><br>${time}</p>`);
 })
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person) {
@@ -49,9 +49,8 @@ app.get("/api/persons/:id", (req, res) => {
                 res.status(404).end();
             }
         })
-        .catch(err => {
-            console.log(err);
-            res.status(500).end();
+        .catch(error => {
+            next(error);
         })
 })
 
@@ -63,7 +62,7 @@ app.delete("/api/persons/:id", (req, res, next) => {
         .catch(error => next(error));
 })
 
-app.post("/api/persons", function(req, res) {
+app.post("/api/persons", (req, res) => {
     const body = req.body;
 
     if (!body.name || !body.number) {
@@ -81,6 +80,18 @@ app.post("/api/persons", function(req, res) {
         res.json(savedPerson);
     })
 })
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message);
+
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformatted id' });
+    }
+
+    next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
