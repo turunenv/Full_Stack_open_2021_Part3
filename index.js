@@ -25,10 +25,13 @@ app.get("/api/persons", function(req, res) {
 
 app.get("/info", (req, res) => {
     let time = Date();
-    let numPersons = persons.length;
-
-    res.send(`<p>Phonebook has info for ${numPersons} people<br><br>${time}</p>`);
+    Person.find({}).then(persons => {
+        const numPersons = persons.length;
+        res.send(`<p>Phonebook has info for ${numPersons} people<br><br>${time}</p>`);
+    })
 })
+
+
 
 app.get("/api/persons/:id", (req, res, next) => {
     Person.findById(req.params.id)
