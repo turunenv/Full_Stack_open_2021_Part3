@@ -13,16 +13,6 @@ app.use(morgan("tiny"));
 
 const Person = require('./models/person.js')
 
-
-
-function doesNameAlreadyExist(name) {
-    let found = persons.find(person => person.name === name);
-    if (found) {
-        return true;
-    }
-    return false;
-}
-
 app.get("/", (req, res) => {
     res.send("<h1>Full Stack open part 3, yey!</h1>");
 })
@@ -66,7 +56,7 @@ app.post("/api/persons", (req, res) => {
     const body = req.body;
 
     if (!body.name || !body.number) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'name or number missing'
         })
     }
@@ -81,6 +71,20 @@ app.post("/api/persons", (req, res) => {
     })
 })
 
+app.put("/api/persons/:id", (req, res, next) => {
+    const body = req.body;
+
+    const person = {
+        number: body.number,
+    };
+
+    Person.findByIdAndUpdate(req.params.id, person, {new: true})
+        .then(updatedPerson => {
+            res.json(updatedPerson)
+        })
+        .catch(error => next(error));
+
+})
 const errorHandler = (error, req, res, next) => {
     console.log(error.message);
 
